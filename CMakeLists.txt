@@ -6,10 +6,21 @@ project(${PROJECT_NAME})
 
 FILE(GLOB SRCS "src/*.cpp" "src/*.c")
 
-FILE(GLOB HEADERS "src/world/*.h" "src/world/*.hpp")
+add_library(${PROJECT_NAME} SHARED ${SRCS})
 
-add_library(${PROJECT_NAME} SHARED ${SRCS} ${HEADERS})
+target_include_directories(${PROJECT_NAME} PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
 
-target_include_directories(${PROJECT_NAME} PUBLIC "src")
 
-install(TARGETS ${PROJECT_NAME})
+install(TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}-export
+    LIBRARY        DESTINATION lib
+    )
+install(DIRECTORY  ${CMAKE_SOURCE_DIR}/include/world/ 
+    DESTINATION include/world
+    FILES_MATCHING PATTERN "*.h*")
+install(EXPORT ${PROJECT_NAME}-export
+    FILE ${PROJECT_NAME}-config.cmake
+    DESTINATION share/cmake/${PROJECT_NAME}/
+    )
